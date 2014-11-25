@@ -26,6 +26,7 @@
 			layoutType:			'ZSSMatrixLayoutGrid',// options are ZSSMatrixLayoutList, ZSSMatrixLayoutGrid
 			numColumns:			6,// Must be multiple of 12
 			errorFileTooLarge:	'File size too large to upload',
+			uploadButtonTitle:	'Upload Files',
 			filesSelected:		function(files) {},
 			progress:			function(progress) {},
 			start:				function(e) {},
@@ -41,20 +42,25 @@
 			
 			var elem = $(this.elem);
 			
+			// Hide labels
+			if (this.config.hideMatrixLabels) {
+				this._hideLabels();
+			}
+			
 			// Check if we are using a compatable layout type
 			if (this.config.layoutType == '' || this.config.layoutType.length == 0) {
-				alert('You need to specify a layout type.');
+				this._log('Error: You need to specify a layout type.');
 				return;
 			}
 			// Check to see if we have formData support
 			if(typeof FormData == 'undefined') {
-				alert('Your browser does not support this method of uploading. Please consider using a modern browser.');
+				this._log('Error: Your browser does not support this method of uploading. Please consider using a modern browser.');
 				return;
 			}
-			
-			// Hide labels
-			if (this.config.hideMatrixLabels) {
-				this._hideLabels();
+			// Check to see if they are trying to show attributes and upload on selected
+			if (this.config.uploadOnSelected && this.config.showAttributes) {
+				this._log('Error: You cannot show attributes and upload on selected.');
+				return;
 			}
 			
 			// Set some default information about the HTML form element
@@ -66,6 +72,7 @@
 			
 			// Set the state defaults
 			this.assetBuilder.droppedFiles = null;
+			this.assetBuilder.filesToUpload = [];
 			this.assetBuilder.incrementFiles = 0;
 			this.assetBuilder.row = null;
 			this.assetBuilder.indexOfRow = 1;
@@ -82,6 +89,13 @@
 			this._bind();
 			
 			return this;
+		},
+		_log:function(message) {
+			if (window.console) {
+				window.console.log(message);
+			} else {
+				alert(message);
+			}
 		},
 		_createTypes: function() {
 		
@@ -128,6 +142,9 @@
 		_dropZone: function() {
 			$(this.elem).append('<div id="zssMatrixUpload" class="zsscontainer-fluid" />');
 			$('#zssMatrixUpload').append('<div id="zssDropZone" class="row"><div class="col-sm-12"><div class="row"><div class="col-sm-12"><p>Drop Here</p></div></div></div></div>');
+			if (!this.config.uploadOnSelected) {
+				$('#zssMatrixUpload').append('<div style="display:none;" class="row zssUploadButton"><div class="col-sm-12"><button type="button">'+this.config.uploadButtonTitle+'</button></div></div>');
+			}
 		},
 		_columns: function(num) {
 			var col;
@@ -151,6 +168,7 @@
 				return col;
 		},
 		_fileType: function(type) {
+			console.log(type);
 			if (type.indexOf('image') != -1) {
 				type = 'image';
 			}else if (type.indexOf('pdf') != -1) {
@@ -165,6 +183,12 @@
 				type = 'word_doc';
 			} else if (type.indexOf('audio') != -1) {
 				type = 'mp3_file';
+			} else if (type.indexOf('rtf') != -1) {
+				type = 'rtf_file';
+			} else if (type.indexOf('text') != -1) {
+				type = 'text_file';
+			} else if (type.indexOf('video') != -1) {
+				type = 'video_file';
 			} else {
 				type = 'file';
 			}
@@ -180,6 +204,12 @@
 				icon = '<i class="fa fa-file-code-o"></i>';
 			} else if (type_code == 'pdf_file') {
 				icon = '<i class="fa fa-file-pdf-o"></i>';
+			} else if (type_code == 'video_file') {
+				icon = '<i class="fa fa-file-video-o"></i>';
+			} else if (type_code == 'rtf_file' || type_code == 'text_file') {
+				icon = '<i class="fa fa-file-text-o"></i>';
+			} else {
+				icon = '<i class="fa fa-file-o"></i>';
 			}
 			return icon;
 		},
@@ -233,8 +263,10 @@
 			$(document).on('drop', drop, function(e) {
 				e = e.originalEvent || e;
 				_this.assetBuilder.droppedFiles = e.files || e.dataTransfer.files;
+				_this.assetBuilder.filesToUpload = _this.assetBuilder.droppedFiles;
+				_this.assetBuilder.droppedFiles = null;
 				_this._filesSelected(e, _this);
-				if (_this.defaults.uploadOnSelected) {
+				if (_this.config.uploadOnSelected) {
 					_this._upload();
 				}
 				e.preventDefault();
@@ -251,7 +283,7 @@
 					$('#zssMatrixUpload').append(this.assetBuilder.row);
 				}
 				var showAttributes = '';
-				if (this.config.showAttributes && !asset.fileSizeTooLarge) {
+				if (this.config.showAttributes && !asset.fileSizeTooLarge && !this.config.uploadOnSelected) {
 				
 					// Find all input fields for this asset type, but not select menu's
 					var typeInputs = this.assetBuilder.formInputs.filter('[name*="'+asset.typeCode+'"]').not(':file, select, :button');
@@ -266,6 +298,7 @@
 							a = '<input type="'+$(this).attr('type')+'" name="'+inputName+'" />';
 						}
 						showAttributes += '<div class="row"><div class="col-sm-12">'+a+'</div></div>';
+						$(this).remove();
 						
 					});
 					
@@ -339,8 +372,8 @@
 			}
 		},
 		_upload: function() {
-			var files = this.assetBuilder.droppedFiles ? this.assetBuilder.droppedFiles : this.assetBuilder.file.files;
-			this.assetBuilder.droppedFiles = null;
+			
+			var files = this.assetBuilder.filesToUpload;
 			if (files) {
 				var imageWindow = window.URL || window.webkitURL;
 				var colNumber = this._columns(this.config.numColumns);
@@ -381,6 +414,9 @@
 		_filesSelected: function(e, _this) {
 			var files = _this.assetBuilder.droppedFiles ? _this.assetBuilder.droppedFiles : _this.assetBuilder.file.files;
 			_this.config.filesSelected(files);
+			if (!_this.config.uploadOnSelected) {
+				$('#zssMatrixUpload .zssUploadButton').show();
+			}
 		},
 	
 	}

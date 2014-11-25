@@ -10,7 +10,7 @@ How It Works
 2. Configure `Asset Types to Create`. Choose only the types that you want to be allowed to upload.
 3. Set the `Create Location`.
 4. Add `%create_form%` to the `Logged In` or `Not Logged In` bodycopy.
-5. Include `jquery.matrixupload2.js` and `matrixupload2.css` in your page or `Design` file. Optionally include `Font Awesome` if you want icons to be used for various asset types.
+5. Include `jquery.matrixupload2.js` and `matrixupload2.css` in your page or `Design` file. Optionally include [Font Awesome](http://fortawesome.github.io/Font-Awesome/) if you want icons to be used for various asset types (recommended).
 6. Include the plugin:
 
 In the `Logged In` or `Not Logged In` bodycopy add the following script:
@@ -42,9 +42,22 @@ The full list of options that can be used:
 | :------------- | :-------------| :----- | :----- |
 | hideMatrixLabels | true  | boolean | Hides all labels that the Asset Builder includes. |
 | showAttributes   | false | boolean | Shows attribute fields for each file. |
-| uploadOnSelected | true  | boolean | If the files should upload after they are chosen. Else use an upload button. |
+| uploadOnSelected | true  | boolean | If the files should upload after they are chosen. Else use an upload button. **NOT READY FOR USE** |
 | layoutType       | ZSSMatrixLayoutGrid | string | Which layout to use. Options are `ZSSMatrixLayoutGrid` and `ZSSMatrixLayoutList`. |
 | numColumns       | 6     | number  | How many columns to use for the desktop layout. Mobile and tablet done automatically. |
+| errorFileTooLarge | File size too large to upload | string | Label to use when a file is too large to upload |
+| uploadButtonTitle | Upload Files | string | Label to use for the upload button |
+
+Callbacks
+
+| Callback     | Returned objects  | Description  |
+| :------------- | :-------------| :----- | :----- |
+| filesSelected | files |  Called when files are selected or dropped |
+| progress | progress |  Progress of the upload |
+| start | e |  When the upload starts for a file |
+| complete | e |  When the upload completes for a file |
+| failed | e |  When the upload fails for a file |
+| cancelled | e |  When the upload is cancelled for a file |
 
 
 Requirements
