@@ -24,7 +24,7 @@
 			showAttributes:		false,
 			uploadOnSelected:	true,
 			layoutType:			'ZSSMatrixLayoutGrid',// options are ZSSMatrixLayoutList, ZSSMatrixLayoutGrid
-			numColumns:			6,// Must be multiple of 12
+			numColumns:			6,// options are 1, 2, 3, 4, 6, 12
 			errorFileTooLarge:	'File size too large to upload',
 			uploadButtonTitle:	'Upload Files',
 			filesSelected:		function(files) {},
