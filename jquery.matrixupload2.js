@@ -200,6 +200,8 @@
 				icon = '<i class="fa fa-file-excel-o"></i>';
 			} else if (type_code == 'word_doc') {
 				icon = '<i class="fa fa-file-word-o"></i>';
+			} else if (type_code == 'image') {
+				icon = '<i class="fa fa-file-image-o"></i>';
 			} else if (type_code == 'js_file' || type_code == 'css_file') {
 				icon = '<i class="fa fa-file-code-o"></i>';
 			} else if (type_code == 'pdf_file') {
