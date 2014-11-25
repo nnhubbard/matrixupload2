@@ -20,19 +20,20 @@
   // the plugin prototype
 	MatrixUpload.prototype = {
 		defaults: {
-			hideMatrixLabels:	true,
-			showAttributes:		false,
-			uploadOnSelected:	true,
-			layoutType:			'ZSSMatrixLayoutGrid',// options are ZSSMatrixLayoutList, ZSSMatrixLayoutGrid
-			numColumns:			6,// options are 1, 2, 3, 4, 6, 12
-			errorFileTooLarge:	'File size too large to upload',
-			uploadButtonTitle:	'Upload Files',
-			filesSelected:		function(files) {},
-			progress:			function(progress) {},
-			start:				function(e) {},
-			complete:			function(e) {},
-			failed:				function(e) {},
-			cancelled:			function(e) {}
+			hideMatrixLabels:		true,
+			showAttributes:			false,
+			uploadOnSelected:		true,
+			layoutType:				'ZSSMatrixLayoutGrid',// options are ZSSMatrixLayoutList, ZSSMatrixLayoutGrid
+			numColumns:				6,// options are 1, 2, 3, 4, 6, 12
+			errorFileTooLarge:		'File size too large to upload',
+			uploadButtonTitle:		'Upload Files',
+			filesSelected:			function(files) {},
+			progress:				function(progress) {},
+			start:					function(e) {},
+			complete:				function(e) {},
+			failed:					function(e) {},
+			cancelled:				function(e) {},
+			browserNotSupported:	function() {}
 		},
 
 	    init: function() {
@@ -47,14 +48,15 @@
 				this._hideLabels();
 			}
 			
+			// Check to see if we have formData support
+			if(!this._support.supportAjaxUploadWithProgress()) {
+				this._log('Error: Your browser does not support ajax progress upload. Please consider using a modern browser.');
+				this.config.browserNotSupported();
+				return;
+			}
 			// Check if we are using a compatable layout type
 			if (this.config.layoutType == '' || this.config.layoutType.length == 0) {
 				this._log('Error: You need to specify a layout type.');
-				return;
-			}
-			// Check to see if we have formData support
-			if(typeof FormData == 'undefined') {
-				this._log('Error: Your browser does not support this method of uploading. Please consider using a modern browser.');
 				return;
 			}
 			// Check to see if they are trying to show attributes and upload on selected
@@ -89,6 +91,26 @@
 			this._bind();
 			
 			return this;
+		},
+		_support: {
+			supportAjaxUploadWithProgress: function() {
+				return supportFileAPI() && supportAjaxUploadProgressEvents() && supportFormData();
+				
+				function supportFileAPI() {
+					var fi = document.createElement('INPUT');
+					fi.type = 'file';
+					return 'files' in fi;
+				};
+				
+				function supportAjaxUploadProgressEvents() {
+					var xhr = new XMLHttpRequest();
+					return !! (xhr && ('upload' in xhr) && ('onprogress' in xhr.upload));
+				};
+				
+				function supportFormData() {
+					return !! window.FormData;
+				}
+			}
 		},
 		_log:function(message) {
 			if (window.console) {

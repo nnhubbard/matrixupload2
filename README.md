@@ -75,6 +75,7 @@ Callbacks
 | complete | e |  When the upload completes for a file |
 | failed | e |  When the upload fails for a file |
 | cancelled | e |  When the upload is cancelled for a file |
+| browserNotSupported | e |  If the browser does not support file upload using ajax |
 
 
 Requirements
