@@ -6,7 +6,14 @@ This plugin is for the `Squiz Matrix` CMS and when used in conjunction with an `
 How It Works
 ---
 
-In your `Logged In` or `Not Logged In` bodycopy add the following script:
+1. Create an `Asset Builder`.
+2. Configure `Asset Types to Create`. Choose only the types that you want to be allowed to upload.
+3. Set the `Create Location`.
+4. Add `%create_form%` to the `Logged In` or `Not Logged In` bodycopy.
+5. Include `jquery.matrixupload2.js` and `matrixupload2.css` in your page or `Design` file. Optionally include `Font Awesome` if you want icons to be used for various asset types.
+6. Include the plugin:
+
+In the `Logged In` or `Not Logged In` bodycopy add the following script:
 
 ```javascript
 $('form[id*="asset_builder"]').matrixUpload();
