@@ -2,7 +2,7 @@
 * Squiz Matrix Multiple File Upload 2 (jquery.matrixupload2.js)
 * version: 0.1 (NOV-19-2014)
 * Copyright (C) 2014 Zed Said Studio
-* @requires jQuery v1.3 or later
+* @requires jQuery v1.7 or later
 *
 * Licensed under the MIT:
 * http://www.opensource.org/licenses/mit-license.php
@@ -21,7 +21,7 @@
 	MatrixUpload.prototype = {
 		defaults: {
 			hideMatrixLabels:	true,
-			showAttributes:		true,
+			showAttributes:		false,
 			uploadOnSelected:	true,
 			layoutType:			'ZSSMatrixLayoutGrid',// options are ZSSMatrixLayoutList, ZSSMatrixLayoutGrid
 			numColumns:			6,// Must be multiple of 12

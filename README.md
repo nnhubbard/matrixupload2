@@ -24,3 +24,17 @@ $('form[id*="asset_builder"]').matrixUpload({
     }
 });
 ```
+
+Options
+---
+
+The full list of options that can be used:
+
+| Option     | Default   | Type  | Description  |
+| ------------- |:-------------:| -----:|
+| hideMatrixLabels | true | boolean | Hides all labels that the Asset Builder includes |
+| showAttributes   | false | boolean | Shows attribute fields for each file |
+
+Requirements
+--------------
+`MatrixUpload2` requires `jQuery 1.7` or later.
