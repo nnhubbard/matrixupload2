@@ -31,9 +31,13 @@ Options
 The full list of options that can be used:
 
 | Option     | Default   | Type  | Description  |
-| ------------- |:-------------:| -----:| -----:|
-| hideMatrixLabels | true | boolean | Hides all labels that the Asset Builder includes |
-| showAttributes   | false | boolean | Shows attribute fields for each file |
+| :------------- | :-------------| :----- | :----- |
+| hideMatrixLabels | true  | boolean | Hides all labels that the Asset Builder includes. |
+| showAttributes   | false | boolean | Shows attribute fields for each file. |
+| uploadOnSelected | true  | boolean | If the files should upload after they are chosen. Else use an upload button. |
+| layoutType       | ZSSMatrixLayoutGrid | string | Which layout to use. Options are `ZSSMatrixLayoutGrid` and `ZSSMatrixLayoutList`. |
+| numColumns       | 6     | number  | How many columns to use for the desktop layout. Mobile and tablet done automatically. |
+
 
 Requirements
 --------------
