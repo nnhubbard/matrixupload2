@@ -11,3 +11,16 @@ In your `Logged In` or `Not Logged In` bodycopy add the following script:
 ```javascript
 $('form[id*="asset_builder"]').matrixUpload();
 ```
+
+Additional options can be included if you want to change the layout or use some of the callbacks:
+
+```javascript
+$('form[id*="asset_builder"]').matrixUpload({
+    progress: function(progress) {
+        console.log(progress);	
+    },
+    filesSelected: function(files) {
+        console.log(files.length);	
+    }
+});
+```

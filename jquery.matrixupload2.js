@@ -248,7 +248,26 @@
 					this.assetBuilder.row = $('<div class="row zssGrid"></div>');
 					$('#zssMatrixUpload').append(this.assetBuilder.row);
 				}
-				var div = '<div id="'+asset.progress+'" class="col-md-'+asset.columnNumber+' col-sm-6 col-xs-12"><div class="row"><div class="col-sm-12">'+asset.mediaTag+'<div class="zssImageInfo">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div></div></div><div class="row"><div class="col-sm-12"><div class="zssProgress"></div></div></div></div>';
+				var showAttributes = '';
+				if (MatrixUpload.defaults.showAttributes) {
+				
+					// Find all input fields for this asset type, but not select menu's
+					var typeInputs = this.assetBuilder.formInputs.filter('[name*="'+asset.typeCode+'"]').not(':file, select, :button');
+					typeInputs.each(function() {
+						
+						var inputName = $(this).attr('name');
+						var htmlType = $(this).prop('tagName').toLowerCase();
+						if (htmlType == 'textarea') {
+							var textarea = '<textarea name="'+inputName+'"></textarea>';
+						} else if (htmlType == 'input') {
+							var input = '<input type="'+$(this).attr('type')+'" name="'+inputName+'" />';
+						}
+						
+					});
+					
+					//showAttributes = '<div class="row"><div class="col-sm-12">'+a+'</div></div>';
+				}
+				var div = '<div id="'+asset.progress+'" class="col-md-'+asset.columnNumber+' col-sm-6 col-xs-12"><div class="row"><div class="col-sm-12">'+asset.mediaTag+'<div class="zssImageInfo">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div></div></div><div class="row"><div class="col-sm-12"><div class="zssProgress"></div></div></div>'+showAttributes+'</div>';
 				this.assetBuilder.row.append(div);
 			}
 			window.URL.revokeObjectURL(asset.file);
