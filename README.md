@@ -3,6 +3,23 @@ Squiz Matrix Multiple File Upload jQuery Plugin
 
 This plugin is for the `Squiz Matrix` CMS and when used in conjunction with an `Asset Builder` you can have simple and beautiful multiple file upload using jQuery and javascript.
 
+`MatrixUpload2` has the following features:
+
+* Multiple file upload using drag and drop or choosing the files.
+* Upload on mobile/tablet or desktop.
+* Simple integration with an `Asset Builder`.
+* Create Type enforcement. Won't let you upload files the `Asset Builder` doesn't allow.
+* Max file size upload enforcement based on your `Squiz Matrix` settings.
+* Two layouts to choose from
+* File upload progress
+* File information such as name, file size, etc.
+* Thumbnail image previews
+* Fully responsive layout
+
+Coming soon:
+
+* Set attributes before uploading
+
 How It Works
 ---
 
@@ -40,7 +57,7 @@ The full list of options that can be used:
 
 | Option     | Default   | Type  | Description  |
 | :------------- | :-------------| :----- | :----- |
-| hideMatrixLabels | true  | boolean | Hides all labels that the Asset Builder includes. |
+| hideMatrixLabels | true  | boolean | Hides all labels that the Asset Builder includes. **NOT READY FOR USE** |
 | showAttributes   | false | boolean | Shows attribute fields for each file. |
 | uploadOnSelected | true  | boolean | If the files should upload after they are chosen. Else use an upload button. **NOT READY FOR USE** |
 | layoutType       | ZSSMatrixLayoutGrid | string | Which layout to use. Options are `ZSSMatrixLayoutGrid` and `ZSSMatrixLayoutList`. |
@@ -62,4 +79,4 @@ Callbacks
 
 Requirements
 --------------
-`MatrixUpload2` requires `jQuery 1.7` or later.
+`MatrixUpload2` requires `jQuery 1.7` or later and a modern browser.
