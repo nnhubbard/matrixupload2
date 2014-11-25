@@ -213,9 +213,9 @@
 			}
 			return icon;
 		},
-		_mediaTag: function(asset, imageWindow) {
+		_mediaTag: function(asset, imageWindow, forceIcon) {
 			var media_tag = '';
-			if (asset.typeCode == 'image') {
+			if (asset.typeCode == 'image' && !forceIcon) {
 				var objectUrl = imageWindow.createObjectURL(asset.file);
 				media_tag = '<img class="zssImage" src="'+objectUrl+'" />';
 			} else {
@@ -275,7 +275,7 @@
 		},
 		_buildLayout: function(asset) {
 			if (this.config.layoutType == 'ZSSMatrixLayoutList') {
-				var div = '<div id="'+asset.progress+'" class="row"><div class="col-sm-2">'+asset.mediaTag+'</div><div class="zssName col-sm-3">'+asset.file.name+' ('+this._bytesToSize(file.size)+')</div>'+'<div class="zssProgressInfo col-sm-3"></div> <div class="col-sm-4"><div class="zssProgress"></div></div></div>';
+				var div = '<div id="'+asset.progress+'" class="row"><div class="col-sm-1">'+asset.mediaTag+'</div><div class="zssName col-sm-5">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div>'+'<div class="zssProgressInfo col-sm-2"></div> <div class="col-sm-4"><div class="zssProgress"></div></div></div>';
 				$('#zssMatrixUpload').append(div);
 			} else if (this.config.layoutType == 'ZSSMatrixLayoutGrid') {
 				if (!this.assetBuilder.row) {
@@ -384,7 +384,7 @@
 					asset.file = file;
 					asset.typeCode = this._fileType(file.type);
 					asset.progress = 'zssProgress'+i+'_'+this.assetBuilder.incrementFiles;
-					asset.mediaTag = this._mediaTag(asset, imageWindow);
+					asset.mediaTag = this._mediaTag(asset, imageWindow, this.config.layoutType == 'ZSSMatrixLayoutGrid' ? false : true);
 					asset.columnNumber = colNumber;
 					asset.fileSizeTooLarge = !(asset.file.size <= this.assetBuilder.maxUploadSize);
 					
