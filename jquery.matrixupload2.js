@@ -298,12 +298,13 @@
 				_this.assetBuilder.file.click();
 			});
 			$(document).on('dragover', drop, function(e) { 
-			    elem.addClass('hover');
+			    $(drop).addClass('hover');
 			    e.preventDefault();
 			    e.stopPropagation();
 			});
-			$(document).on('dragend', drop, function(e) {
-			    elem.removeClass('hover');
+			$(document).on('dragleave', drop, function(e) {
+			    $(drop).removeClass('hover');
+			    console.log('done dragging');
 			    e.preventDefault();
 			    e.stopPropagation();
 			});

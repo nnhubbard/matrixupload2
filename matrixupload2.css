@@ -20,8 +20,9 @@
 	line-height: 175px;
 	font-size: 14px;
 }
-#zssDropZone.hover {
-	background-color: #ccc;
+#zssDropZone.hover,
+#zssDropZone:hover {
+	background-color: #eeeeee;
 }
 .zssUploadButton {
 	position: absolute;
