@@ -2,46 +2,23 @@
 	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-size: 14px;
 	line-height: 1.42857143;
-	color: #333333;
+	color: #505050;
 	background-color: #ffffff;
 	font-family: sans-serif;
 	-ms-text-size-adjust: 100%;
 	-webkit-text-size-adjust: 100%;
 	position: relative;
 }
-#zssMatrixUpload ul {
-	margin: 10px 0 0 0;
-	padding: 0;
-	list-style: none;
-}
-#zssMatrixUpload li {
-	height: auto;
-	margin-bottom: 10px;
-	font-size: 13px;
-}
-#zssMatrixUpload li img {
-	width: auto;
-	height: 100px;
-}
 #zssDropZone {
-	border: 2px dashed #000;
+	border: 2px dashed #c4c4c4;
 	text-align: center;
 	height: 200px;
 	line-height: 50px;
-	margin: 0 0 15px 0;
-}
-#zssDropZone a {
+	margin: 15px 0 15px 0;
+	background-color: #f8f9f8;
 	text-transform: uppercase;
-	border: 1px solid #333;
-	padding: 2px 8px;
-	display: block;
-	width: auto;
-	margin: 0 auto;
-	cursor: pointer;
-	border-radius: 6px;
-	height: 30px;
-	width: 100px;
-	line-height: 18px;
+	line-height: 175px;
+	font-size: 14px;
 }
 #zssDropZone.hover {
 	background-color: #ccc;
@@ -53,9 +30,23 @@
 
 }
 .zssProgress {
-	background-color: #1D62F0;
 	height: 2px;
 	margin-top: 2px;
+}
+.zssList.row {
+	padding: 8px 6px;
+	border-top: 1px solid #dcdddc;
+}
+.zssList .zssProgress {
+	height: 12px;
+	background-color: #e3e3e3;
+	border: 1px solid #cccccc;
+}
+.zssList.row:nth-child(even) {
+   background-color: #f8f9f8;
+}
+.zssList:last-child {
+	border-bottom: 1px solid #dcdddc;
 }
 .zssGrid .zssImage {
 	background-repeat: no-repeat;
