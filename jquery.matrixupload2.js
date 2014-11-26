@@ -299,7 +299,12 @@
 		},
 		_buildLayout: function(asset) {
 			if (this.config.layoutType == 'ZSSMatrixLayoutList') {
-				var div = '<div id="'+asset.progress+'" class="row zssList"><div class="col-sm-1">'+asset.mediaTag+'</div><div class="zssName col-sm-5">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div>'+'<div class="zssProgressInfo col-sm-2"></div> <div class="col-sm-4"><div class="zssProgress"></div></div></div>';
+				
+				var p = '<div class="zssProgress"></div>';
+				if (asset.fileSizeTooLarge) {
+					p = '<div class="zssNoUploadWarning">'+this.config.errorFileTooLarge+'</div>';
+				}
+				var div = '<div id="'+asset.progress+'" class="row zssList"><div class="col-sm-1">'+asset.mediaTag+'</div><div class="zssName col-sm-5">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div>'+'<div class="zssProgressInfo col-sm-2"></div> <div class="col-sm-4">'+p+'</div></div>';
 				$('#zssMatrixUpload').append(div);
 			} else if (this.config.layoutType == 'ZSSMatrixLayoutGrid') {
 				if (!this.assetBuilder.row) {
