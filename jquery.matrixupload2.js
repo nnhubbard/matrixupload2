@@ -27,6 +27,7 @@
 			numColumns:				6,// options are 1, 2, 3, 4, 6, 12
 			errorFileTooLarge:		'File size too large to upload',
 			uploadButtonTitle:		'Upload Files',
+			queryParameters:		{},
 			filesSelected:			function(files) {},
 			progress:				function(progress) {},
 			start:					function(e) {},
@@ -67,7 +68,7 @@
 			
 			// Set some default information about the HTML form element
 			elem.addClass('zssMatrixUpload2');
-			this.assetBuilder.url = elem.attr('action');
+			this.assetBuilder.url = this._url();
 			this.assetBuilder.id = elem.attr('id').replace('page_asset_builder_', '');
 			this.assetBuilder.createTypes = this._createTypes();
 			this.assetBuilder.maxUploadSize = this._maxUploadSize();
@@ -118,6 +119,29 @@
 			} else {
 				alert(message);
 			}
+		},
+		_url: function() {
+		
+			var url = $(this.elem).attr('action').replace('?', '');
+			var p = this.config.queryParameters;
+			Object.size = function(obj) {
+			    var size = 0, key;
+			    for (key in obj) {
+			        if (obj.hasOwnProperty(key)) size++;
+			    }
+			    return size;
+			};
+			if (Object.size(p) > 0) {
+				var query = '';
+				for (var key in p) {
+				  if (p.hasOwnProperty(key)) {
+				  	query += key+'='+p[key]+'&';
+				  }
+				}
+				url = url+'?'+query;
+			}
+			
+			return url;
 		},
 		_createTypes: function() {
 		
@@ -190,7 +214,6 @@
 				return col;
 		},
 		_fileType: function(type) {
-			console.log(type);
 			if (type.indexOf('image') != -1) {
 				type = 'image';
 			}else if (type.indexOf('pdf') != -1) {

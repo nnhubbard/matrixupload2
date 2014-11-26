@@ -48,6 +48,16 @@ $('form[id*="asset_builder"]').matrixUpload({
     }
 });
 ```
+
+Optionional query parameters can be sent which will be appended to the URL when each asset is created. This can be used with `Additional Create Locations` and `GET Variable Name`.
+
+```javascript
+$('form[id*="asset_builder"]').matrixUpload({
+    queryParameters: {
+        'root': '1234'
+    }
+});
+
 **Make sure to call the plugin inside of the `jQuery` [ready method](http://api.jquery.com/ready) so that the DOM will be fully loaded.**
 
 Options
@@ -64,6 +74,7 @@ The full list of options that can be used:
 | numColumns       | 6     | number  | How many columns to use for the desktop layout. Mobile and tablet are automatic. Options are `1`, `2`, `3`, `4`, `6`, `12`. |
 | errorFileTooLarge | File size too large to upload | string | Label to use when a file is too large to upload |
 | uploadButtonTitle | Upload Files | string | Label to use for the upload button |
+| queryParameters   | {} | object | Key/value pairs to send as part of the query string |
 
 Callbacks
 
