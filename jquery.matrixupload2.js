@@ -264,7 +264,8 @@
 			var media_tag = '';
 			if (asset.typeCode == 'image' && !forceIcon) {
 				var objectUrl = imageWindow.createObjectURL(asset.file);
-				media_tag = '<img class="zssImage" src="'+objectUrl+'" />';
+				//media_tag = '<img class="zssImage" src="'+objectUrl+'" />';
+				media_tag = '<div class="zssImage" style="background-image:url(\''+objectUrl+'\')"></div>';
 			} else {
 				media_tag = this._iconForFileType(asset.typeCode);
 			}
@@ -364,7 +365,7 @@
 					});
 					
 				}
-				var div = '<div id="'+asset.progress+'" class="col-md-'+asset.columnNumber+' col-sm-6 col-xs-12"><div class="row"><div class="col-sm-12">'+asset.mediaTag+'<div class="zssImageInfo">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div></div></div><div class="row"><div class="col-sm-12"><div class="zssProgress"></div></div></div>'+showAttributes+'</div>';
+				var div = '<div id="'+asset.progress+'" class="col-md-'+asset.columnNumber+' col-sm-6 col-xs-12"><div class="row"><div class="col-sm-12">'+asset.mediaTag+'</div></div><div class="row"><div class="col-sm-12"><div class="zssImageInfo">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div></div></div><div class="row"><div class="col-sm-12"><div class="zssProgress"></div></div></div>'+showAttributes+'</div>';
 				this.assetBuilder.row.append(div);
 			}
 			window.URL.revokeObjectURL(asset.file);

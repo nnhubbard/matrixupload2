@@ -20,6 +20,20 @@ Coming soon:
 
 * Set attributes before uploading
 
+Layouts
+---
+
+There are two layouts to choose from, `ZSSMatrixLayoutGrid` or `ZSSMatrixLayoutList`.
+
+**List**
+
+![List](http://cl.ly/image/0w1j0s113A44/list.jpg "List")
+
+**Grid**
+
+![Grid](http://cl.ly/image/0I0q1H333a0o/grid.jpg "Grid")
+
+
 How It Works
 ---
 
