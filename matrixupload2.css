@@ -37,6 +37,12 @@
 	padding: 8px 6px;
 	border-top: 1px solid #dcdddc;
 }
+.zssList.header {
+	font-weight: bold;
+	border-bottom: 1px solid #dcdddc;
+	border-top: none;
+	background: none !important;
+}
 .zssList .zssProgress {
 	height: 12px;
 	background-color: #e3e3e3;
@@ -800,4 +806,24 @@ body {
 .zsscontainer-fluid:after,
 .row:after {
   clear: both;
+}
+@media (max-width: 767px) {
+  .hidden-xs {
+    display: none !important;
+  }
+}
+@media (min-width: 768px) and (max-width: 991px) {
+  .hidden-sm {
+    display: none !important;
+  }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  .hidden-md {
+    display: none !important;
+  }
+}
+@media (min-width: 1200px) {
+  .hidden-lg {
+    display: none !important;
+  }
 }

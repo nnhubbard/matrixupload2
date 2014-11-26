@@ -300,10 +300,18 @@
 		_buildLayout: function(asset) {
 			if (this.config.layoutType == 'ZSSMatrixLayoutList') {
 				
+				// Check to see if the file size is too large
 				var p = '<div class="zssProgress"></div>';
 				if (asset.fileSizeTooLarge) {
 					p = '<div class="zssNoUploadWarning">'+this.config.errorFileTooLarge+'</div>';
 				}
+				
+				// Header row
+				if ($('.zssList.header').length == 0) {
+					var header = '<div class="row zssList header hidden-xs"><div class="col-sm-1"></div><div class="col-sm-5">File Name</div><div class="col-sm-2">Loaded</div> <div class="col-sm-4">Progress</div></div>';
+					$('#zssMatrixUpload').append(header);
+				}
+				
 				var div = '<div id="'+asset.progress+'" class="row zssList"><div class="col-sm-1">'+asset.mediaTag+'</div><div class="zssName col-sm-5">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div>'+'<div class="zssProgressInfo col-sm-2"></div> <div class="col-sm-4">'+p+'</div></div>';
 				$('#zssMatrixUpload').append(div);
 			} else if (this.config.layoutType == 'ZSSMatrixLayoutGrid') {
