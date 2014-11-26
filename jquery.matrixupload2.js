@@ -33,7 +33,7 @@
 			start:					function(e) {},
 			complete:				function(e) {},
 			failed:					function(e) {},
-			cancelled:				function(e) {},
+			canceled:				function(e) {},
 			browserNotSupported:	function() {}
 		},
 
@@ -416,7 +416,7 @@
 					_this._failed(e, _this);
 				});
 				xhr.upload.addEventListener("abort", function(e) {
-					_this._cancelled(e, _this);
+					_this._canceled(e, _this);
 				});
 				xhr.upload.addEventListener("loadstart", function(e) {
 					_this._start(e, _this);
@@ -468,8 +468,8 @@
 		_failed: function(e, _this) {
 			_this.config.failed(e);
 		},
-		_cancelled: function(e, _this) {
-			_this.config.cancelled(e);
+		_canceled: function(e, _this) {
+			_this.config.canceled(e);
 		},
 		_filesSelected: function(e, _this) {
 			var files = _this.assetBuilder.droppedFiles ? _this.assetBuilder.droppedFiles : _this.assetBuilder.file.files;

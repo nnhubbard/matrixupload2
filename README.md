@@ -49,7 +49,7 @@ $('form[id*="asset_builder"]').matrixUpload({
 });
 ```
 
-Optionional query parameters can be sent which will be appended to the URL when each asset is created. This can be used with `Additional Create Locations` and `GET Variable Name`.
+Optional query parameters can be sent which will be appended to the URL when each asset is created. This can be used with `Additional Create Locations` and `GET Variable Name`.
 
 ```javascript
 $('form[id*="asset_builder"]').matrixUpload({
@@ -86,7 +86,7 @@ Callbacks
 | start | e |  When the upload starts for a file |
 | complete | e |  When the upload completes for a file |
 | failed | e |  When the upload fails for a file |
-| cancelled | e |  When the upload is cancelled for a file |
+| canceled | e |  When the upload is canceled for a file |
 | browserNotSupported |  |  If the browser does not support file upload using ajax |
 
 
