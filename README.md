@@ -57,6 +57,7 @@ $('form[id*="asset_builder"]').matrixUpload({
         'root': '1234'
     }
 });
+```
 
 **Make sure to call the plugin inside of the `jQuery` [ready method](http://api.jquery.com/ready) so that the DOM will be fully loaded.**
 
