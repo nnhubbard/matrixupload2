@@ -162,6 +162,9 @@
 			return createTypes;
 		
 		},
+		_createTypeAllowed: function(asset) {
+			return !($.inArray(asset.typeCode, this.assetBuilder.createTypes) == -1);
+		},
 		_maxUploadSize: function() {
 			return parseFloat($(this.elem).find('[id*="_file_upload"] span').text().replace(/[^0-9\.]+/g,""))*1000000;
 		},
@@ -292,7 +295,7 @@
 			$(document).on('change', elem, function(e) {
 				_this._filesSelected(e, _this);
 				if (_this.config.uploadOnSelected) {
-					_this._upload();
+					_this._prepareUpload();
 				}
 			});
 			$(document).on('click', drop, function() {
@@ -305,7 +308,6 @@
 			});
 			$(document).on('dragleave', drop, function(e) {
 			    $(drop).removeClass('hover');
-			    console.log('done dragging');
 			    e.preventDefault();
 			    e.stopPropagation();
 			});
@@ -316,20 +318,23 @@
 				_this.assetBuilder.droppedFiles = null;
 				_this._filesSelected(e, _this);
 				if (_this.config.uploadOnSelected) {
-					_this._upload();
+					_this._prepareUpload();
 				}
 				e.preventDefault();
 				e.stopPropagation();
 			});
 		},
 		_buildLayout: function(asset) {
+		
+			// Check to see if the file size is too large
+			var p = '<div class="zssProgress"></div>';
+			if (!asset.createTypeAllowed) {
+				p = '<div class="zssNoUploadWarning"><em>'+asset.typeCode+'</em> not configured as a create type</div>';
+			} else if (asset.fileSizeTooLarge) {
+				p = '<div class="zssNoUploadWarning">'+this.config.errorFileTooLarge+'</div>';
+			}
+			
 			if (this.config.layoutType == 'ZSSMatrixLayoutList') {
-				
-				// Check to see if the file size is too large
-				var p = '<div class="zssProgress"></div>';
-				if (asset.fileSizeTooLarge) {
-					p = '<div class="zssNoUploadWarning">'+this.config.errorFileTooLarge+'</div>';
-				}
 				
 				// Header row
 				if ($('.zssList.header').length == 0) {
@@ -365,7 +370,7 @@
 					});
 					
 				}
-				var div = '<div id="'+asset.progress+'" class="col-md-'+asset.columnNumber+' col-sm-6 col-xs-12"><div class="row"><div class="col-sm-12">'+asset.mediaTag+'</div></div><div class="row"><div class="col-sm-12"><div class="zssImageInfo">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div></div></div><div class="row"><div class="col-sm-12"><div class="zssProgress"></div></div></div>'+showAttributes+'</div>';
+				var div = '<div id="'+asset.progress+'" class="col-md-'+asset.columnNumber+' col-sm-6 col-xs-12"><div class="row"><div class="col-sm-12">'+asset.mediaTag+'</div></div><div class="row"><div class="col-sm-12"><div class="zssImageInfo">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div></div></div><div class="row"><div class="col-sm-12">'+p+'</div></div>'+showAttributes+'</div>';
 				this.assetBuilder.row.append(div);
 			}
 			window.URL.revokeObjectURL(asset.file);
@@ -402,38 +407,30 @@
 		},
 		_makeRequest: function(asset) {
 			var _this = this;
-			if (!asset.fileSizeTooLarge) {
-				var xhr = new XMLHttpRequest();
-				(function(progress) { 
-				    xhr.upload.onprogress = function(e) {
-				        if (e.lengthComputable) {
-				        	_this._progress(asset, e);
-				        }
-				    };
-				}(asset.progress));
-				xhr.upload.addEventListener('load', function(e) {
-					_this._complete(e, _this);
-				});
-				xhr.upload.addEventListener('error', function(e) {
-					_this._failed(e, _this);
-				});
-				xhr.upload.addEventListener("abort", function(e) {
-					_this._canceled(e, _this);
-				});
-				xhr.upload.addEventListener("loadstart", function(e) {
-					_this._start(e, _this);
-				});
-				xhr.open("POST", this.assetBuilder.url);
-				xhr.send(this._formData(asset));
-			} else {
-				// The file size is too large, do not upload
-				$('#'+asset.progress).addClass('zssNoUpload');
-				if (this.config.layoutType == 'ZSSMatrixLayoutGrid') {
-					$('#'+asset.progress+' .zssImageInfo').after('<div class="zssNoUploadWarning">'+_this.config.errorFileTooLarge+'</div>');
-				}
-			}
+			var xhr = new XMLHttpRequest();
+			(function(progress) { 
+			    xhr.upload.onprogress = function(e) {
+			        if (e.lengthComputable) {
+			        	_this._progress(asset, e);
+			        }
+			    };
+			}(asset.progress));
+			xhr.upload.addEventListener('load', function(e) {
+				_this._complete(e, _this);
+			});
+			xhr.upload.addEventListener('error', function(e) {
+				_this._failed(e, _this);
+			});
+			xhr.upload.addEventListener("abort", function(e) {
+				_this._canceled(e, _this);
+			});
+			xhr.upload.addEventListener("loadstart", function(e) {
+				_this._start(e, _this);
+			});
+			xhr.open("POST", this.assetBuilder.url);
+			xhr.send(this._formData(asset));
 		},
-		_upload: function() {
+		_prepareUpload: function() {
 			
 			var files = this.assetBuilder.filesToUpload;
 			if (files) {
@@ -449,6 +446,7 @@
 					asset.mediaTag = this._mediaTag(asset, imageWindow, this.config.layoutType == 'ZSSMatrixLayoutGrid' ? false : true);
 					asset.columnNumber = colNumber;
 					asset.fileSizeTooLarge = !(asset.file.size <= this.assetBuilder.maxUploadSize);
+					asset.createTypeAllowed = this._createTypeAllowed(asset);
 					
 					this.assetBuilder.incrementFiles++;
 					
@@ -456,7 +454,9 @@
 					this._buildLayout(asset);
 					
 					// Make the request to upload
-					this._makeRequest(asset);
+					if (!asset.fileSizeTooLarge && asset.createTypeAllowed) {
+						this._makeRequest(asset);
+					}
 					
 				}//end for
 			}//end if

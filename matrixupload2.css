@@ -73,9 +73,6 @@
 .zssGrid div .row div {
 	text-align: center;
 }
-.zssGrid .zssNoUpload .zssProgress {
-	display: none;
-}
 .zssGrid .zssNoUploadWarning {
 	margin-bottom: 10px;
 	text-align: left !important;
