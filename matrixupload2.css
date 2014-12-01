@@ -13,11 +13,10 @@
 	border: 2px dashed #c4c4c4;
 	text-align: center;
 	height: 200px;
-	line-height: 50px;
 	margin: 15px 0 15px 0;
 	background-color: #f8f9f8;
 	text-transform: uppercase;
-	line-height: 175px;
+	padding-top: 90px;
 	font-size: 14px;
 }
 #zssDropZone.hover,
