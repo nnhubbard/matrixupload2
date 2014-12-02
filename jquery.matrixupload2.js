@@ -1,6 +1,6 @@
 /**
 * Squiz Matrix Multiple File Upload 2 (jquery.matrixupload2.js)
-* version: 0.1 (NOV-19-2014)
+* version: 0.1.1 (NOV-19-2014)
 * Copyright (C) 2014 Zed Said Studio
 * @requires jQuery v1.7 or later
 *
@@ -79,6 +79,7 @@
 			this.assetBuilder.incrementFiles = 0;
 			this.assetBuilder.row = null;
 			this.assetBuilder.indexOfRow = 1;
+			this.assetBuilder.assetsToUpload = [];
 			
 			// Modify default Asset Builder form elements
 			this.assetBuilder.formInputs = elem.find('input');
@@ -92,6 +93,7 @@
 			this._bind();
 			
 			return this;
+			
 		},
 		_support: {
 			supportAjaxUploadWithProgress: function() {
@@ -144,11 +146,7 @@
 			return url;
 		},
 		_createTypes: function() {
-		
-			var elem = $(this.elem);
 			var _this = this;
-			
-			// Check to see if we have more than one create type
 			var createTypes = [];
 			if ($('#sq-asset-builder-header').length) {
 				$('#sq-asset-builder-header li').each(function() {
@@ -160,7 +158,6 @@
 				createTypes.push(typeCode);
 			}
 			return createTypes;
-		
 		},
 		_createTypeAllowed: function(asset) {
 			return !($.inArray(asset.typeCode, this.assetBuilder.createTypes) == -1);
@@ -175,11 +172,7 @@
 			$(this.elem).find('.sq-backend-smallprint').hide();
 		},
 		_formElements: function() {
-		
-			var elem = $(this.elem);
-			
-			// Allow multiple selection
-			var file_element = elem.find(':file');
+			var file_element = $(this.elem).find(':file');
 			if (file_element.length == 0) {
 				alert('You are missing the file upload button. Make sure to include the %create_form% or %details-F_file_upload% keyword.');
 				return;
@@ -267,7 +260,6 @@
 			var media_tag = '';
 			if (asset.typeCode == 'image' && !forceIcon) {
 				var objectUrl = imageWindow.createObjectURL(asset.file);
-				//media_tag = '<img class="zssImage" src="'+objectUrl+'" />';
 				media_tag = '<div class="zssImage" style="background-image:url(\''+objectUrl+'\')"></div>';
 			} else {
 				media_tag = this._iconForFileType(asset.typeCode);
@@ -294,9 +286,7 @@
 			
 			$(document).on('change', elem, function(e) {
 				_this._filesSelected(e, _this);
-				if (_this.config.uploadOnSelected) {
-					_this._prepareUpload();
-				}
+				_this._prepareUpload();
 			});
 			$(document).on('click', drop, function() {
 				_this.assetBuilder.file.click();
@@ -317,11 +307,12 @@
 				_this.assetBuilder.filesToUpload = _this.assetBuilder.droppedFiles;
 				_this.assetBuilder.droppedFiles = null;
 				_this._filesSelected(e, _this);
-				if (_this.config.uploadOnSelected) {
-					_this._prepareUpload();
-				}
+				_this._prepareUpload();
 				e.preventDefault();
 				e.stopPropagation();
+			});
+			$(document).on('click', '.zssUploadButton button', function(e) {
+				_this._upload();
 			});
 		},
 		_buildLayout: function(asset) {
@@ -401,6 +392,9 @@
 		_progress: function(asset, e) {
 			var percentComplete = Math.min(100, Math.round(e.loaded * 100 / e.total));
 			var percent = percentComplete.toString();
+			if (!$('#'+asset.progress+' .zssProgress').hasClass('active')) {
+				$('#'+asset.progress+' .zssProgress').addClass('active');
+			}
 			$('#'+asset.progress+' .zssProgress').css('width', percent + '%');
 			$('#'+asset.progress+' .zssProgressInfo').text(' '+percent+'%');
 			this.config.progress(percent);
@@ -447,19 +441,30 @@
 					asset.columnNumber = colNumber;
 					asset.fileSizeTooLarge = !(asset.file.size <= this.assetBuilder.maxUploadSize);
 					asset.createTypeAllowed = this._createTypeAllowed(asset);
+					this.assetBuilder.assetsToUpload.push(asset);
 					
 					this.assetBuilder.incrementFiles++;
 					
 					// Build the layout
 					this._buildLayout(asset);
 					
-					// Make the request to upload
-					if (!asset.fileSizeTooLarge && asset.createTypeAllowed) {
-						this._makeRequest(asset);
-					}
-					
 				}//end for
+				
+				if (this.config.uploadOnSelected) {
+					this._upload();
+				}
+				
 			}//end if
+		},
+		_upload: function() {
+			var assets = this.assetBuilder.assetsToUpload;
+			for (var i = 0, asset; asset = assets[i]; i++) {
+				if (!asset.fileSizeTooLarge && asset.createTypeAllowed) {
+					this._makeRequest(asset);
+					
+				}
+			}
+			this.assetBuilder.assetsToUpload = [];
 		},
 		_complete: function(e, _this) {
 			_this.config.complete(e);

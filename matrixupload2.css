@@ -13,10 +13,11 @@
 	border: 2px dashed #c4c4c4;
 	text-align: center;
 	height: 200px;
+	line-height: 50px;
 	margin: 15px 0 15px 0;
 	background-color: #f8f9f8;
 	text-transform: uppercase;
-	padding-top: 90px;
+	line-height: 175px;
 	font-size: 14px;
 }
 #zssDropZone.hover,
@@ -25,13 +26,31 @@
 }
 .zssUploadButton {
 	position: absolute;
-	bottom: 0;
-	z-index: 999;
-
+	bottom: -60px;
+	padding-bottom: 20px;
+}
+.zssUploadButton button {
+	background-color: #f7f9f7;
+	border: 1px solid #dbdddb;
+	color: #6b6b6b;
+	padding: 8px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 13px;
+}
+.zssUploadButton button:hover,
+.zssUploadButton button:active {
+	background-color: #eeeeee;
 }
 .zssProgress {
-	height: 2px;
+	height: 12px;
 	margin-top: 2px;
+	background-color: #e3e3e3;
+	border: none;
+	width: 0px;
+}
+.zssProgress.active {
+	border: 1px solid #cccccc !important;
 }
 .zssList.row {
 	padding: 8px 6px;
@@ -42,11 +61,6 @@
 	border-bottom: 1px solid #dcdddc;
 	border-top: none;
 	background: none !important;
-}
-.zssList .zssProgress {
-	height: 12px;
-	background-color: #e3e3e3;
-	border: 1px solid #cccccc;
 }
 .zssList.row:nth-child(even) {
    background-color: #f8f9f8;
@@ -79,9 +93,6 @@
 }
 .zssGrid .zssProgress {
 	margin: 6px 0 10px 0;
-	height: 12px;
-	background-color: #e3e3e3;
-	border: 1px solid #cccccc;
 }
 .zssGrid .zssImageInfo {
 	text-align: left !important;
