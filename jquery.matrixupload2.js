@@ -23,8 +23,8 @@
 			hideMatrixLabels:		true,
 			showAttributes:			false,
 			uploadOnSelected:		true,
-			layoutType:				'ZSSMatrixLayoutGrid',// options are ZSSMatrixLayoutList, ZSSMatrixLayoutGrid
-			numColumns:				6,// options are 1, 2, 3, 4, 6, 12
+			layoutType:				'ZSSMatrixLayoutGrid',
+			numColumns:				6,
 			errorFileTooLarge:		'File size too large to upload',
 			uploadButtonTitle:		'Upload Files',
 			queryParameters:		{},
@@ -49,21 +49,9 @@
 				this._hideLabels();
 			}
 			
-			// Check to see if we have formData support
-			if(!this._support.supportAjaxUploadWithProgress()) {
-				this._log('Error: Your browser does not support ajax progress upload. Please consider using a modern browser.');
-				this.config.browserNotSupported();
-				return;
-			}
-			// Check if we are using a compatable layout type
-			if (this.config.layoutType == '' || this.config.layoutType.length == 0) {
-				this._log('Error: You need to specify a layout type.');
-				return;
-			}
-			// Check to see if they are trying to show attributes and upload on selected
-			if (this.config.uploadOnSelected && this.config.showAttributes) {
-				this._log('Error: You cannot show attributes and upload on selected.');
-				return;
+			// Check to see if there are errors initializing the plugin
+			if (this._errors()) {
+				return;	
 			}
 			
 			// Set some default information about the HTML form element
@@ -86,14 +74,48 @@
 			this.assetBuilder.formInputs.hide();
 			this.assetBuilder.file = this._formElements();
 			
-			// Build the drag and drop location
 			this._dropZone();
-			
-			// Bind all of the events needed for this plugin to be awesome
 			this._bind();
 			
 			return this;
 			
+		},
+		_errors: function() {
+		
+			// Check to see if we have formData support
+			if(!this._support.supportAjaxUploadWithProgress()) {
+				this._log('Error: Your browser does not support ajax progress upload. Please consider using a modern browser.');
+				this.config.browserNotSupported();
+				return true;
+			}
+			// Check if we are using a compatable layout type
+			if (this.config.layoutType == '' || this.config.layoutType.length == 0) {
+				this._log('Error: You need to specify a layout type.');
+				return true;
+			}
+			// Check to see if they are trying to show attributes and upload on selected
+			if (this.config.uploadOnSelected && this.config.showAttributes) {
+				this._log('Error: You cannot show attributes and upload on selected.');
+				return true;
+			}
+			// Check to see if we are using a valid layout type
+			if ($.inArray(this.config.layoutType, this._validLayoutTypes()) == -1) {
+				this._log('Error: "'+this.config.layoutType+'" is not a valid layout type. Valid types are '+this._validLayoutTypes().join(', ')+'.');
+				return true;
+			}
+			// Check to see if a valid column number was used
+			if ($.inArray(this.config.numColumns, this._validColumnTypes()) == -1) {
+				this._log('Error: "'+this.config.numColumns+'" is not a valid column number. Valid numbers are '+this._validColumnTypes().join(', ')+'.');
+				return true;
+			}
+			
+			return false;
+		},
+		_validLayoutTypes: function() {
+			return ['ZSSMatrixLayoutList', 'ZSSMatrixLayoutGrid'];
+		},
+		_validColumnTypes: function() {
+			return [1, 2, 3, 4, 6, 12];
 		},
 		_support: {
 			supportAjaxUploadWithProgress: function() {
@@ -124,7 +146,7 @@
 		},
 		_url: function() {
 		
-			var url = $(this.elem).attr('action').replace('?', '');
+			var url = $(this.elem).attr('action');
 			var p = this.config.queryParameters;
 			Object.size = function(obj) {
 			    var size = 0, key;
@@ -140,7 +162,7 @@
 				  	query += key+'='+p[key]+'&';
 				  }
 				}
-				url = url+'?'+query;
+				url = url.replace('?', '')+'?'+query;
 			}
 			
 			return url;
@@ -210,22 +232,27 @@
 				return col;
 		},
 		_fileType: function(type) {
+			console.log(type);
 			if (type.indexOf('image') != -1) {
 				type = 'image';
-			}else if (type.indexOf('pdf') != -1) {
+			} else if (type.indexOf('pdf') != -1) {
 				type = 'pdf_file';
 			} else if (type.indexOf('css') != -1) {
 				type = 'css_file';
-			}else if (type.indexOf('javascript') != -1) {
+			} else if (type.indexOf('javascript') != -1) {
 				type = 'js_file';
-			}else if (type.indexOf('spreadsheet') != -1 || type.indexOf('excel') != -1) {
+			} else if (type.indexOf('spreadsheet') != -1 || type.indexOf('excel') != -1) {
 				type = 'excel_doc';
 			} else if (type.indexOf('wordprocessing') != -1 || type.indexOf('msword') != -1) {
 				type = 'word_doc';
+			} else if (type.indexOf('presentation') != -1 || type.indexOf('powerpoint') != -1) {
+				type = 'powerpoint_doc';
 			} else if (type.indexOf('audio') != -1) {
 				type = 'mp3_file';
 			} else if (type.indexOf('rtf') != -1) {
 				type = 'rtf_file';
+			} else if (type.indexOf('text/xml') != -1) {
+				type = 'xml_file';
 			} else if (type.indexOf('text') != -1) {
 				type = 'text_file';
 			} else if (type.indexOf('video') != -1) {
@@ -241,6 +268,8 @@
 				icon = '<i class="fa fa-file-excel-o"></i>';
 			} else if (type_code == 'word_doc') {
 				icon = '<i class="fa fa-file-word-o"></i>';
+			} else if (type_code == 'powerpoint_doc') {
+				icon = '<i class="fa fa-file-powerpoint-o"></i>';
 			} else if (type_code == 'image') {
 				icon = '<i class="fa fa-file-image-o"></i>';
 			} else if (type_code == 'js_file' || type_code == 'css_file') {
@@ -249,7 +278,7 @@
 				icon = '<i class="fa fa-file-pdf-o"></i>';
 			} else if (type_code == 'video_file') {
 				icon = '<i class="fa fa-file-video-o"></i>';
-			} else if (type_code == 'rtf_file' || type_code == 'text_file') {
+			} else if (type_code == 'rtf_file' || type_code == 'text_file' || type_code == 'xml_file') {
 				icon = '<i class="fa fa-file-text-o"></i>';
 			} else {
 				icon = '<i class="fa fa-file-o"></i>';
@@ -329,12 +358,13 @@
 				
 				// Header row
 				if ($('.zssList.header').length == 0) {
-					var header = '<div class="row zssList header hidden-xs"><div class="col-sm-1"></div><div class="col-sm-5">File Name</div><div class="col-sm-2">Loaded</div> <div class="col-sm-4">Progress</div></div>';
+					var header = '<div class="row zssList header hidden-xs"><div class="col-sm-1"></div><div class="col-sm-5">File Name</div><div class="col-sm-2">Uploaded</div> <div class="col-sm-4">Progress</div></div>';
 					$('#zssMatrixUpload').append(header);
 				}
 				
-				var div = '<div id="'+asset.progress+'" class="row zssList"><div class="col-sm-1">'+asset.mediaTag+'</div><div class="zssName col-sm-5">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div>'+'<div class="zssProgressInfo col-sm-2"></div> <div class="col-sm-4">'+p+'</div></div>';
+				var div = '<div id="'+asset.progress+'" class="row zssList"><div class="col-sm-1">'+asset.mediaTag+'</div><div class="zssName col-sm-5">'+asset.file.name+' ('+this._bytesToSize(asset.file.size)+')</div>'+'<div class="zssProgressInfo col-sm-2">0%</div> <div class="col-sm-4">'+p+'</div></div>';
 				$('#zssMatrixUpload').append(div);
+				
 			} else if (this.config.layoutType == 'ZSSMatrixLayoutGrid') {
 				if (!this.assetBuilder.row) {
 					this.assetBuilder.row = $('<div class="row zssGrid"></div>');
@@ -402,13 +432,11 @@
 		_makeRequest: function(asset) {
 			var _this = this;
 			var xhr = new XMLHttpRequest();
-			(function(progress) { 
-			    xhr.upload.onprogress = function(e) {
-			        if (e.lengthComputable) {
-			        	_this._progress(asset, e);
-			        }
-			    };
-			}(asset.progress));
+			xhr.upload.addEventListener('progress', function(e) {
+				if (e.lengthComputable) {
+					_this._progress(asset, e);
+				}
+			});
 			xhr.upload.addEventListener('load', function(e) {
 				_this._complete(e, _this);
 			});
