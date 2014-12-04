@@ -1,6 +1,6 @@
 /**
 * Squiz Matrix Multiple File Upload 2 (jquery.matrixupload2.js)
-* version: 0.1.1 (NOV-19-2014)
+* Version: 0.1.1
 * Copyright (C) 2014 Zed Said Studio
 * @requires jQuery v1.7 or later
 *
@@ -27,6 +27,7 @@
 			numColumns:				6,
 			errorFileTooLarge:		'File size too large to upload',
 			uploadButtonTitle:		'Upload Files',
+			concurrentUploads:		4,
 			queryParameters:		{},
 			filesSelected:			function(files) {},
 			progress:				function(progress) {},
@@ -62,12 +63,13 @@
 			this.assetBuilder.maxUploadSize = this._maxUploadSize();
 			
 			// Set the state defaults
-			this.assetBuilder.droppedFiles = null;
 			this.assetBuilder.filesToUpload = [];
 			this.assetBuilder.incrementFiles = 0;
 			this.assetBuilder.row = null;
 			this.assetBuilder.indexOfRow = 1;
 			this.assetBuilder.assetsToUpload = [];
+			this.assetBuilder.assetsToUploadAll = [];
+			this.assetBuilder.uploadStarted = false;
 			
 			// Modify default Asset Builder form elements
 			this.assetBuilder.formInputs = elem.find('input');
@@ -106,6 +108,11 @@
 			// Check to see if a valid column number was used
 			if ($.inArray(this.config.numColumns, this._validColumnTypes()) == -1) {
 				this._log('Error: "'+this.config.numColumns+'" is not a valid column number. Valid numbers are '+this._validColumnTypes().join(', ')+'.');
+				return true;
+			}
+			// Check if there are too many concurrent downloads
+			if (this.config.concurrentUploads > 6) {
+				this._log('Error: '+this.config.concurrentUploads+' concurrent downloads is too high. Most browser have a max of 6.');
 				return true;
 			}
 			
@@ -184,6 +191,16 @@
 		_createTypeAllowed: function(asset) {
 			return !($.inArray(asset.typeCode, this.assetBuilder.createTypes) == -1);
 		},
+		_duplicateFileName: function(asset) {
+			var assets = this.assetBuilder.assetsToUploadAll;
+			for (i = 0; i < assets.length; i++) { 
+			    var a = assets[i];
+			    if (a.file.name == asset.file.name) {
+			    	return true;
+			    }
+			}
+			return false;
+		},
 		_maxUploadSize: function() {
 			return parseFloat($(this.elem).find('[id*="_file_upload"] span').text().replace(/[^0-9\.]+/g,""))*1000000;
 		},
@@ -205,7 +222,7 @@
 		},
 		_dropZone: function() {
 			$(this.elem).append('<div id="zssMatrixUpload" class="zsscontainer-fluid" />');
-			$('#zssMatrixUpload').append('<div id="zssDropZone" class="row"><div class="col-sm-12"><div class="row"><div class="col-sm-12"><p>Drop Here</p></div></div></div></div>');
+			$('#zssMatrixUpload').append('<div id="zssDropZone" class="row"><div class="col-sm-12"><div class="row"><div class="col-sm-12"><p class="hidden-xs">Click or Drop Here</p><p class="hidden-sm hidden-md hidden-lg">Tap Here</p></div></div></div></div>');
 			if (!this.config.uploadOnSelected) {
 				$('#zssMatrixUpload').append('<div style="display:none;" class="row zssUploadButton"><div class="col-sm-12"><button type="button">'+this.config.uploadButtonTitle+'</button></div></div>');
 			}
@@ -232,7 +249,6 @@
 				return col;
 		},
 		_fileType: function(type) {
-			console.log(type);
 			if (type.indexOf('image') != -1) {
 				type = 'image';
 			} else if (type.indexOf('pdf') != -1) {
@@ -307,43 +323,6 @@
 		    }
 		    return (bytes / 1000).toFixed(2) + ' KB';
 		},
-		_bind: function() {
-		
-			var elem = $(this.elem);
-			var _this = this;
-			var drop = '#zssDropZone';
-			
-			$(document).on('change', elem, function(e) {
-				_this._filesSelected(e, _this);
-				_this._prepareUpload();
-			});
-			$(document).on('click', drop, function() {
-				_this.assetBuilder.file.click();
-			});
-			$(document).on('dragover', drop, function(e) { 
-			    $(drop).addClass('hover');
-			    e.preventDefault();
-			    e.stopPropagation();
-			});
-			$(document).on('dragleave', drop, function(e) {
-			    $(drop).removeClass('hover');
-			    e.preventDefault();
-			    e.stopPropagation();
-			});
-			$(document).on('drop', drop, function(e) {
-				e = e.originalEvent || e;
-				_this.assetBuilder.droppedFiles = e.files || e.dataTransfer.files;
-				_this.assetBuilder.filesToUpload = _this.assetBuilder.droppedFiles;
-				_this.assetBuilder.droppedFiles = null;
-				_this._filesSelected(e, _this);
-				_this._prepareUpload();
-				e.preventDefault();
-				e.stopPropagation();
-			});
-			$(document).on('click', '.zssUploadButton button', function(e) {
-				_this._upload();
-			});
-		},
 		_buildLayout: function(asset) {
 		
 			// Check to see if the file size is too large
@@ -352,6 +331,8 @@
 				p = '<div class="zssNoUploadWarning"><em>'+asset.typeCode+'</em> not configured as a create type</div>';
 			} else if (asset.fileSizeTooLarge) {
 				p = '<div class="zssNoUploadWarning">'+this.config.errorFileTooLarge+'</div>';
+			} else if (asset.duplicateFileName) {
+				p = '<div class="zssNoUploadWarning">A file with the name <em>'+asset.file.name+'</em> has already been uploaded and will conflict.</div>';
 			}
 			
 			if (this.config.layoutType == 'ZSSMatrixLayoutList') {
@@ -438,7 +419,7 @@
 				}
 			});
 			xhr.upload.addEventListener('load', function(e) {
-				_this._complete(e, _this);
+				_this._complete(e, _this, asset);
 			});
 			xhr.upload.addEventListener('error', function(e) {
 				_this._failed(e, _this);
@@ -451,6 +432,13 @@
 			});
 			xhr.open("POST", this.assetBuilder.url);
 			xhr.send(this._formData(asset));
+			
+			// Remove the asset once the request has been made
+			var i = _this.assetBuilder.assetsToUpload.indexOf(asset);
+			if (i != -1) {
+				_this.assetBuilder.assetsToUpload.splice(i, 1);
+			}
+			
 		},
 		_prepareUpload: function() {
 			
@@ -469,7 +457,12 @@
 					asset.columnNumber = colNumber;
 					asset.fileSizeTooLarge = !(asset.file.size <= this.assetBuilder.maxUploadSize);
 					asset.createTypeAllowed = this._createTypeAllowed(asset);
-					this.assetBuilder.assetsToUpload.push(asset);
+					asset.duplicateFileName = this._duplicateFileName(asset);
+					
+					if (!asset.fileSizeTooLarge && asset.createTypeAllowed && !asset.duplicateFileName) {
+						this.assetBuilder.assetsToUpload.push(asset);
+						this.assetBuilder.assetsToUploadAll.push(asset);
+					}
 					
 					this.assetBuilder.incrementFiles++;
 					
@@ -485,16 +478,33 @@
 			}//end if
 		},
 		_upload: function() {
-			var assets = this.assetBuilder.assetsToUpload;
-			for (var i = 0, asset; asset = assets[i]; i++) {
-				if (!asset.fileSizeTooLarge && asset.createTypeAllowed) {
-					this._makeRequest(asset);
-					
-				}
-			}
-			this.assetBuilder.assetsToUpload = [];
+			
+			if (this.assetBuilder.assetsToUpload.length > 0) {
+				
+				// Loop through the assets to upload, but only upload in our chunk size, we only do this the first time
+				var size = (this.config.concurrentUploads <= this.assetBuilder.assetsToUpload.length) ? this.config.concurrentUploads : this.assetBuilder.assetsToUpload.length;
+				if (!this.assetBuilder.uploadStarted) {
+					for (i = 0; i < size; i++) { 
+					    var asset = this.assetBuilder.assetsToUpload[i];
+					    if (asset) {
+					    	this._makeRequest(asset);
+					    }
+					}//end for
+					this.assetBuilder.uploadStarted = true;
+				} else {
+					var asset = this.assetBuilder.assetsToUpload[0];
+					if (asset) {
+						this._makeRequest(asset);
+					}
+				}//end else
+			} else {
+				this.assetBuilder.uploadStarted = false;
+				this.assetBuilder.assetsToUpload = [];
+			}//end else
+			
 		},
-		_complete: function(e, _this) {
+		_complete: function(e, _this, asset) {
+			_this._upload();
 			_this.config.complete(e);
 		},
 		_start: function(e, _this) {
@@ -507,12 +517,48 @@
 			_this.config.canceled(e);
 		},
 		_filesSelected: function(e, _this) {
-			var files = _this.assetBuilder.droppedFiles ? _this.assetBuilder.droppedFiles : _this.assetBuilder.file.files;
+			var files = _this.assetBuilder.filesToUpload;
 			_this.config.filesSelected(files);
 			if (!_this.config.uploadOnSelected) {
 				$('#zssMatrixUpload .zssUploadButton').show();
 			}
 		},
+		_bind: function() {
+		
+			var elem = $(this.elem);
+			var _this = this;
+			var drop = '#zssDropZone';
+			
+			$(document).on('change', elem, function(e) {
+				_this.assetBuilder.filesToUpload = _this.assetBuilder.file.files;
+				_this._filesSelected(e, _this);
+				_this._prepareUpload();
+			});
+			$(document).on('click', drop, function() {
+				_this.assetBuilder.file.click();
+			});
+			$(document).on('dragover', drop, function(e) { 
+			    $(drop).addClass('hover');
+			    e.preventDefault();
+			    e.stopPropagation();
+			});
+			$(document).on('dragleave', drop, function(e) {
+			    $(drop).removeClass('hover');
+			    e.preventDefault();
+			    e.stopPropagation();
+			});
+			$(document).on('drop', drop, function(e) {
+				e = e.originalEvent || e;
+				_this.assetBuilder.filesToUpload = e.files || e.dataTransfer.files;
+				_this._filesSelected(e, _this);
+				_this._prepareUpload();
+				e.preventDefault();
+				e.stopPropagation();
+			});
+			$(document).on('click', '.zssUploadButton button', function(e) {
+				_this._upload();
+			});
+		}
 	
 	}
 

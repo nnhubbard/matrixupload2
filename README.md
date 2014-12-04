@@ -89,6 +89,7 @@ The full list of options that can be used:
 | numColumns       | 6     | number  | How many columns to use for the desktop layout. Mobile and tablet are automatic. Options are `1`, `2`, `3`, `4`, `6`, `12`. |
 | errorFileTooLarge | File size too large to upload | string | Label to use when a file is too large to upload |
 | uploadButtonTitle | Upload Files | string | Label to use for the upload button |
+| concurrentUploads | 4 | number | Number of uploads at one time. Max of 6 due to browser support. |
 | queryParameters   | {} | object | Key/value pairs to send as part of the query string |
 
 Callbacks
@@ -102,6 +103,16 @@ Callbacks
 | failed | e |  When the upload fails for a file |
 | canceled | e |  When the upload is canceled for a file |
 | browserNotSupported |  |  If the browser does not support file upload using ajax |
+
+
+Responsive
+---
+
+In order to have responsive layouts work for mobile and tablet, you must include the following `viewport` line into the `head` of your page:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1">
+```
 
 
 Requirements
