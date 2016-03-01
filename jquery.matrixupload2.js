@@ -1,7 +1,7 @@
 /**
 * Squiz Matrix Multiple File Upload 2 (jquery.matrixupload2.js)
-* Version: 0.1.1
-* Copyright (C) 2014 Zed Said Studio
+* Version: 0.1.2
+* Copyright (C) 2016 Zed Said Studio
 * @requires jQuery v1.7 or later
 *
 * Licensed under the MIT:
@@ -169,7 +169,13 @@
 				  	query += key+'='+p[key]+'&';
 				  }
 				}
-				url = url.replace('?', '')+'?'+query;
+				
+				if (url.indexOf('?') != -1) {
+					url = url+'&'+query;
+				} else {
+					url = url.replace('?', '')+'?'+query;
+				}
+				
 			}
 			
 			return url;
