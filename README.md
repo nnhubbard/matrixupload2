@@ -73,6 +73,22 @@ $('form[id*="asset_builder"]').matrixUpload({
 });
 ```
 
+To return the created asset id for each image, add the following to the `Asset Builder` Created bodycopy:
+
+```html 
+<div id="asset-id">%created_assetid%</div>
+```
+
+Use the returned response from the complete callback to capture the asset id:
+
+```javascript
+$('form[id*="asset_builder"]').matrixUpload({
+    complete: function(e, response) {
+        console.log($(response).find('#asset-id').text());	
+    }
+});
+```
+
 **Make sure to call the plugin inside of the `jQuery` [ready method](http://api.jquery.com/ready) so that the DOM will be fully loaded.**
 
 Options
