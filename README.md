@@ -99,7 +99,7 @@ Callbacks
 | filesSelected | files |  Called when files are selected or dropped |
 | progress | progress |  Progress of the upload |
 | start | e |  When the upload starts for a file |
-| complete | e |  When the upload completes for a file |
+| complete | e, reponseText |  When the upload completes for a file |
 | failed | e |  When the upload fails for a file |
 | canceled | e |  When the upload is canceled for a file |
 | browserNotSupported |  |  If the browser does not support file upload using ajax |
