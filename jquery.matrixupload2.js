@@ -32,7 +32,7 @@
 			filesSelected:			function(files) {},
 			progress:				function(progress) {},
 			start:					function(e) {},
-			complete:				function(e) {},
+			complete:				function(e, responseText) {},
 			failed:					function(e) {},
 			canceled:				function(e) {},
 			browserNotSupported:	function() {}
@@ -424,8 +424,8 @@
 					_this._progress(asset, e);
 				}
 			});
-			xhr.upload.addEventListener('load', function(e) {
-				_this._complete(e, _this, asset);
+			xhr.addEventListener('load', function(e) {
+				_this._complete(e, _this, asset, xhr.responseText);
 			});
 			xhr.upload.addEventListener('error', function(e) {
 				_this._failed(e, _this);
@@ -436,7 +436,7 @@
 			xhr.upload.addEventListener("loadstart", function(e) {
 				_this._start(e, _this);
 			});
-			xhr.open("POST", this.assetBuilder.url);
+			xhr.open("POST", this.assetBuilder.url, true);
 			xhr.send(this._formData(asset));
 			
 			// Remove the asset once the request has been made
@@ -509,9 +509,9 @@
 			}//end else
 			
 		},
-		_complete: function(e, _this, asset) {
+		_complete: function(e, _this, asset, responseText) {
 			_this._upload();
-			_this.config.complete(e);
+			_this.config.complete(e, responseText);
 		},
 		_start: function(e, _this) {
 			_this.config.start(e);
