@@ -397,10 +397,12 @@
 			this.assetBuilder.formInputs.each(function() {
 				var input_name = $(this).attr('name');
 				var input_val;
-				if (input_name.indexOf('CREATE_TYPE') != -1) {
-					input_val = asset.typeCode;	
-				} else {
-					input_val = $(this).val();
+				if (typeof input_name !== "undefined") {
+					if (input_name.indexOf('CREATE_TYPE') != -1) {
+						input_val = asset.typeCode;	
+					} else {
+						input_val = $(this).val();
+					}
 				}
 				fd.append(input_name, input_val);
 			});
